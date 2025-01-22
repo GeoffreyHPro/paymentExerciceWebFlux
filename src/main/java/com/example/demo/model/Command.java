@@ -1,12 +1,11 @@
 package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NulValueException;
-
-
 
 @Table("command")
 public class Command {
@@ -14,16 +13,29 @@ public class Command {
     @Id
     private int id;
 
+    @Column("productName")
     private String productName;
 
+    @Column("productRef")
     private String productRef;
 
     private int quantity;
 
     private Double price;
 
+    @Column("paymentId")
+    private int paymentId;
+
     public Command() {
 
+    }
+
+    public int getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(int paymentId) {
+        this.paymentId = paymentId;
     }
 
     public Command(String productName, String productRef, int quantity, Double price)
