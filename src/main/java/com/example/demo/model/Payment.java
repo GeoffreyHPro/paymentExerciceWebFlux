@@ -99,6 +99,8 @@ public class Payment {
         } else if (paymentStatus.equals(PaymentStatus.AUTHORIZED)
                 && this.paymentStatus.equals(PaymentStatus.IN_PROGRESS.name())) {
             this.paymentStatus = paymentStatus.name();
+        } else if (this.paymentStatus.equals(paymentStatus.name())) {
+
         } else {
             throw new PaymentStatusException();
         }
@@ -107,21 +109,4 @@ public class Payment {
     public int getId() {
         return id;
     }
-
-    /*
-     * public List<Command> getListCommands() {
-     * return listCommands;
-     * }
-     * 
-     * public void setListCommands(List<Command> listCommands) {
-     * this.listCommands = listCommands;
-     * }
-     */
-
-    /*
-     * public void addCommand(Command command) {
-     * this.listCommands.add(command);
-     * this.amount += command.getPrice();
-     * }
-     */
 }
