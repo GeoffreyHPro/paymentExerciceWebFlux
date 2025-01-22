@@ -50,6 +50,7 @@ public class CommandController {
                 .map(command -> ResponseEntity.status(201).body(paymentMapper.toCommandDTO(command)))
                 .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
                 .onErrorResume(NulValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(PaymentStatusException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
                 .onErrorResume(NegativeValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
     }
 }

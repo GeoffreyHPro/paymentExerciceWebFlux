@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.NulValueException;
+import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.model.Command;
 import com.example.demo.repository.CommandRepository;
 import com.example.demo.repository.PaymentRepository;
@@ -34,7 +35,8 @@ public class CommandService {
         return command.switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
-    public Mono<Command> addCommand(int id, CommandRequest commandRequest) throws NegativeValueException, NulValueException {
+    public Mono<Command> addCommand(int id, CommandRequest commandRequest)
+            throws NegativeValueException, NulValueException {
         Command command = new Command();
         command.setPrice(commandRequest.getPrice());
         command.setQuantity(commandRequest.getQuantity());
@@ -49,7 +51,7 @@ public class CommandService {
                         command.setPaymentId(id);
                         return commandRepository.save(command);
                     } else {
-                        return null;
+                        return Mono.error(new PaymentStatusException());
                     }
                 });
     }
