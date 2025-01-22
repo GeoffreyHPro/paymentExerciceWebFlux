@@ -32,7 +32,7 @@ public class CommandService {
 
     public Flux<Command> getCommands(int idPayment) {
         Flux<Command> command = commandRepository.findByPaymentId(idPayment);
-        return command.switchIfEmpty(Mono.error(new NotFoundException()));
+        return command;
     }
 
     public Mono<Command> addCommand(int id, CommandRequest commandRequest)
@@ -46,11 +46,17 @@ public class CommandService {
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
                 .flatMap(payment -> {
-                    String status = payment.getPaymentStatus();
-                    if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
-                        command.setPaymentId(id);
-                        return commandRepository.save(command);
-                    } else {
+                    try {
+                        String status = payment.getPaymentStatus();
+                        if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
+                            command.setPaymentId(id);
+                            payment.setAmount(10.0);
+                            return paymentRepository.save(payment)
+                                    .then(commandRepository.save(command));
+                        } else {
+                            return Mono.error(new PaymentStatusException());
+                        }
+                    } catch (Exception e) {
                         return Mono.error(new PaymentStatusException());
                     }
                 });

@@ -17,9 +17,9 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Mono<Payment> getPayment(int id) throws NotFoundException {
+    public Mono<Payment> getPayment(int id) {
         Mono<Payment> payment = paymentRepository.findById(id);
-        return payment.switchIfEmpty(Mono.error(new NotFoundException()));
+        return payment;
     }
 
     public Mono<Payment> addPayment() {

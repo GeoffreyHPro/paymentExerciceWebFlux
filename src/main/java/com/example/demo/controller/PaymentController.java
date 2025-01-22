@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Payment;
 import com.example.demo.request.UpdatePaymentRequest;
 import com.example.demo.service.CommandService;
@@ -33,19 +32,17 @@ public class PaymentController {
     private PaymentMapper paymentMapper;
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<?>> getPayment(@PathVariable int id) throws NotFoundException {
+    public Mono<ResponseEntity<?>> getPayment(@PathVariable int id) {
         return paymentService.getPayment(id)
                 .flatMap(payment -> {
-                    if (payment == null) {
-                        return Mono.just(ResponseEntity.status(404).body(null));
-                    }
+
                     return commandService.getCommands(id)
                             .collectList()
                             .map(commands -> {
                                 payment.setListeCommands(commands);
                                 return ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment));
                             });
-                }).onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
+                });
     }
 
     @PostMapping
@@ -54,7 +51,6 @@ public class PaymentController {
             Mono<Payment> payment = paymentService.addPayment();
             return Mono.just(ResponseEntity.status(201).body(payment));
         } catch (Exception e) {
-            System.out.println(e);
             return Mono.just(ResponseEntity.status(201).body("The payment is created"));
         }
     }

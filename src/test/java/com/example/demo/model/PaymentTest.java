@@ -14,14 +14,10 @@ import com.example.demo.utils.PaymentStatus;
 
 public class PaymentTest {
     private Payment payment;
-    private Command command;
-    private Command command2;
 
     @BeforeEach
     public void setUp() throws NegativeValueException, NulValueException {
         this.payment = new Payment();
-        this.command = new Command("ball", "051854", 2, 10.0);
-        this.command2 = new Command("hat", "051823", 1, 20.0);
     }
 
     @Test
