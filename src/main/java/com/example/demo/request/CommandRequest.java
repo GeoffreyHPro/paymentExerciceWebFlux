@@ -1,5 +1,7 @@
 package com.example.demo.request;
 
+import java.beans.Transient;
+
 import lombok.Data;
 
 @Data
@@ -14,5 +16,10 @@ public class CommandRequest {
         this.productRef = productRef;
         this.quantity = quantity;
         this.price = price;
+    }
+
+    @Transient
+    public Boolean isValid() {
+        return (this.price > 0) && (this.quantity > 0);
     }
 }

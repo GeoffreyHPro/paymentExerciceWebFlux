@@ -13,6 +13,7 @@ import com.example.demo.dto.CommandDTO;
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.NulValueException;
+import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.request.CommandRequest;
 import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
@@ -39,11 +40,16 @@ public class CommandController {
     @PostMapping("/{idPayment}")
     public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment,
             @RequestBody CommandRequest commandRequest)
-            throws NegativeValueException, NulValueException, NotFoundException {
+            throws NegativeValueException, NulValueException, PaymentStatusException {
+
+        if (!commandRequest.isValid()) {
+            return Mono.just(ResponseEntity.status(400).body(null));
+        }
 
         return commandService.addCommand(idPayment, commandRequest)
                 .map(command -> ResponseEntity.status(201).body(paymentMapper.toCommandDTO(command)))
-                .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
-
+                .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(NulValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(NegativeValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
     }
 }

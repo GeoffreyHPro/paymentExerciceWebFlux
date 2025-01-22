@@ -16,7 +16,7 @@ public class PaymentMapper {
         commandDTO.setPrice(command.getPrice());
         commandDTO.setProductName(command.getProductName());
         commandDTO.setProductRef(command.getProductRef());
-        commandDTO.setProductRef(command.getProductRef());
+        commandDTO.setQuantity(command.getQuantity());
         return commandDTO;
     }
 
