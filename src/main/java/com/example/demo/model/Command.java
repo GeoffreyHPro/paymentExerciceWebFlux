@@ -6,8 +6,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NulValueException;
 
-
-
 @Table("command")
 public class Command {
 
@@ -21,6 +19,8 @@ public class Command {
     private int quantity;
 
     private Double price;
+
+    private int paymentId;
 
     public Command() {
 

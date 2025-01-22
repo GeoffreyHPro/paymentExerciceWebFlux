@@ -1,9 +1,11 @@
 package com.example.demo.model;
 
-import java.util.ArrayList;
+import java.beans.Transient;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NulValueException;
@@ -12,6 +14,7 @@ import com.example.demo.utils.Currency;
 import com.example.demo.utils.PaymentMeans;
 import com.example.demo.utils.PaymentStatus;
 
+@Table("payment")
 public class Payment {
     @Id
     private int id;
@@ -20,20 +23,32 @@ public class Payment {
 
     private String currency;
 
+    @Column("paymentMeans")
     private String paymentMeans;
 
+    @Column("paymentStatus")
     private String paymentStatus;
 
-    private List<Command> listCommands;
+    @org.springframework.data.annotation.Transient
+    private List<Command> listeCommands;
 
     public Payment() {
-        this.listCommands = new ArrayList<>();
         this.paymentStatus = PaymentStatus.IN_PROGRESS.name();
         this.amount = 0.0;
+        this.currency = Currency.DOLLAR.name();
+        this.paymentMeans = PaymentMeans.BANK_CARD.name();
     }
 
     public String getCurrency() {
         return currency;
+    }
+
+    public List<Command> getListeCommands() {
+        return listeCommands;
+    }
+
+    public void setListeCommands(List<Command> listeCommands) {
+        this.listeCommands = listeCommands;
     }
 
     public Double getAmount() {
@@ -90,16 +105,24 @@ public class Payment {
         }
     }
 
-    public List<Command> getListCommands() {
-        return listCommands;
+    public int getId() {
+        return id;
     }
 
-    public void setListCommands(List<Command> listCommands) {
-        this.listCommands = listCommands;
-    }
+    /*
+     * public List<Command> getListCommands() {
+     * return listCommands;
+     * }
+     * 
+     * public void setListCommands(List<Command> listCommands) {
+     * this.listCommands = listCommands;
+     * }
+     */
 
-    public void addCommand(Command command) {
-        this.listCommands.add(command);
-        this.amount += command.getPrice();
-    }
+    /*
+     * public void addCommand(Command command) {
+     * this.listCommands.add(command);
+     * this.amount += command.getPrice();
+     * }
+     */
 }
