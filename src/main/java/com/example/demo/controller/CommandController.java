@@ -1,16 +1,22 @@
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.Command;
+import com.example.demo.dto.CommandDTO;
+import com.example.demo.exception.NegativeValueException;
+import com.example.demo.exception.NotFoundException;
+import com.example.demo.exception.NulValueException;
+import com.example.demo.exception.PaymentStatusException;
+import com.example.demo.request.CommandRequest;
 import com.example.demo.service.CommandService;
+import com.example.demo.service.PaymentMapper;
 
 import reactor.core.publisher.Mono;
 
@@ -21,21 +27,30 @@ public class CommandController {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private PaymentMapper paymentMapper;
+
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Command>> getCommand(@PathVariable int id) throws NotFoundException {
-
-        return commandService.getCommand(id).map(command -> ResponseEntity.status(200).body(command))
+    public Mono<ResponseEntity<CommandDTO>> getCommand(@PathVariable int id) throws NotFoundException {
+        return commandService.getCommand(id)
+                .map(command -> ResponseEntity.status(200).body(paymentMapper.toCommandDTO(command)))
                 .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
-
     }
 
-    @PostMapping
-    public Mono<ResponseEntity<?>> addCommand() {
-        try {
-            Mono<Command> command = commandService.addCommand();
-            return Mono.just(ResponseEntity.status(201).body(command));
-        } catch (Exception e) {
-            return Mono.just(ResponseEntity.status(400).body("Error of created command"));
+    @PostMapping("/{idPayment}")
+    public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment,
+            @RequestBody CommandRequest commandRequest)
+            throws NegativeValueException, NulValueException, PaymentStatusException {
+
+        if (!commandRequest.isValid()) {
+            return Mono.just(ResponseEntity.status(400).body(null));
         }
+
+        return commandService.addCommand(idPayment, commandRequest)
+                .map(command -> ResponseEntity.status(201).body(paymentMapper.toCommandDTO(command)))
+                .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(NulValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(PaymentStatusException.class, e -> Mono.just(ResponseEntity.status(404).body(null)))
+                .onErrorResume(NegativeValueException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
     }
 }

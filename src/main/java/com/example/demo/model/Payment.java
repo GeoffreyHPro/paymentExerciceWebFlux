@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import java.beans.Transient;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
