@@ -10,19 +10,19 @@ Here the database in API
 
 <img src="public/demo.png" width="350"/>
 
-
-
-
-
 # 👩‍💻 Technologies
 
 | Back - Spring Boot | version (works) | 
 | --- | --- |
 | java | 22 |
 | maven| 3.9.6 |
-
+| Docker| 26.1.1 |
 
 # 🛠 Project and funtionnalities
+
+✅ Read a command
+
+✅ Read a payment
 
 ⬜ create a command
 
@@ -34,6 +34,19 @@ Here the database in API
 
 # ⚡️ Standard Execution
 
+Start postgresql database
+
+```bash
+docker-compose up
+```
+
+Start API REST
+
+```bash
+mvn spring-boot:run
+```
+
+URL of Swagger: http://localhost:8080/swagger-ui.html
 
 # Future functionalities and perspective
 
