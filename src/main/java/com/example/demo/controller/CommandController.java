@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ import com.example.demo.dto.CommandDTO;
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.NulValueException;
+import com.example.demo.request.CommandRequest;
 import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
 
@@ -35,10 +37,11 @@ public class CommandController {
     }
 
     @PostMapping("/{idPayment}")
-    public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment)
+    public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment,
+            @RequestBody CommandRequest commandRequest)
             throws NegativeValueException, NulValueException, NotFoundException {
 
-        return commandService.addCommand(idPayment)
+        return commandService.addCommand(idPayment, commandRequest)
                 .map(command -> ResponseEntity.status(201).body(paymentMapper.toCommandDTO(command)))
                 .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
 

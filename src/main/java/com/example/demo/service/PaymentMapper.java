@@ -12,7 +12,7 @@ public class PaymentMapper {
     public CommandDTO toCommandDTO(Command command) {
         CommandDTO commandDTO = new CommandDTO();
         commandDTO.setId(command.getId());
-        commandDTO.setPaymentId(command.getId());
+        commandDTO.setPaymentId(command.getPaymentId());
         commandDTO.setPrice(command.getPrice());
         commandDTO.setProductName(command.getProductName());
         commandDTO.setProductRef(command.getProductRef());

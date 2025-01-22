@@ -10,6 +10,7 @@ import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.model.Command;
 import com.example.demo.repository.CommandRepository;
 import com.example.demo.repository.PaymentRepository;
+import com.example.demo.request.CommandRequest;
 import com.example.demo.utils.PaymentStatus;
 
 import reactor.core.publisher.Flux;
@@ -34,7 +35,7 @@ public class CommandService {
         return command.switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
-    public Mono<Command> addCommand(int id) throws NegativeValueException, NulValueException {
+    public Mono<Command> addCommand(int id, CommandRequest commandRequest) throws NegativeValueException, NulValueException {
 
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
@@ -42,7 +43,7 @@ public class CommandService {
                     try {
                         String status = payment.getPaymentStatus();
                         if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
-                            Command command = new Command("ball", "16546", 2, 20.0);
+                            Command command = new Command(commandRequest.getProductName(), commandRequest.getProductRef(), commandRequest.getQuantity(), commandRequest.getPrice());
                             command.setPaymentId(id);
                             return commandRepository.save(command);
                         } else {
