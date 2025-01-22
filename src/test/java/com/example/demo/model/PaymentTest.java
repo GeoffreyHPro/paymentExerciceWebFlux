@@ -26,15 +26,15 @@ public class PaymentTest {
 
     @Test
     public void testPaymentConstructor() {
-        assertEquals(PaymentStatus.IN_PROGRESS, this.payment.getPaymentStatus());
+        assertEquals(PaymentStatus.IN_PROGRESS.name(), this.payment.getPaymentStatus());
     }
 
     @Test
     public void testPaymentStatusSuccess() throws PaymentStatusException {
         this.payment.setPaymentStatus(PaymentStatus.AUTHORIZED);
-        assertEquals(PaymentStatus.AUTHORIZED, this.payment.getPaymentStatus());
+        assertEquals(PaymentStatus.AUTHORIZED.name(), this.payment.getPaymentStatus());
         this.payment.setPaymentStatus(PaymentStatus.CAPTURED);
-        assertEquals(PaymentStatus.CAPTURED, this.payment.getPaymentStatus());
+        assertEquals(PaymentStatus.CAPTURED.name(), this.payment.getPaymentStatus());
     }
 
     @Test
