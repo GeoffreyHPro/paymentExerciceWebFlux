@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Payment;
 import com.example.demo.repository.PaymentRepository;
 
