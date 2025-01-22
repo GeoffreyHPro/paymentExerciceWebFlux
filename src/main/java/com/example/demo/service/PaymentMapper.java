@@ -27,7 +27,7 @@ public class PaymentMapper {
         paymentDTO.setCurrency(payment.getCurrency());
         paymentDTO.setPaymentMeans(payment.getPaymentMeans());
         paymentDTO.setPaymentStatus(payment.getPaymentStatus());
-        if (!payment.getListeCommands().isEmpty()) {
+        if (payment.getListeCommands() != null && payment.getListeCommands().size() > 0) {
             paymentDTO.setListeCommands(payment.getListeCommands());
         }
         return paymentDTO;

@@ -61,13 +61,14 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<?>> modifyPayment(@PathVariable int id,
-            @RequestBody UpdatePaymentRequest updatePaymentRequest) {
-        try {
-            Mono<Payment> payment = paymentService.updatePayment(id, updatePaymentRequest);
-            return Mono.just(ResponseEntity.status(200).body(payment));
-        } catch (Exception e) {
-            return Mono.just(ResponseEntity.status(400).body("Error in Payment"));
-        }
+    public Mono<ResponseEntity<PaymentDTO>> modifyPayment(@PathVariable int id,
+            @RequestBody UpdatePaymentRequest updatePaymentRequest) throws NotFoundException {
+
+        return paymentService.updatePayment(id, updatePaymentRequest)
+                .map(payment -> ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment)))
+                .onErrorResume(
+                        NotFoundException.class,
+                        e -> Mono.just(ResponseEntity.status(404).body(null)));
+
     }
 }
