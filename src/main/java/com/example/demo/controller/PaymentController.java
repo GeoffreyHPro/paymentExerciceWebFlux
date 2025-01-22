@@ -6,12 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Payment;
 import com.example.demo.service.CommandService;
+import com.example.demo.service.PaymentMapper;
 import com.example.demo.service.PaymentService;
 
 import reactor.core.publisher.Mono;
@@ -26,6 +26,9 @@ public class PaymentController {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private PaymentMapper paymentMapper;
+
     @GetMapping("/{id}")
     public Mono<ResponseEntity<?>> getPayment(@PathVariable int id) throws NotFoundException {
         return paymentService.getPayment(id)
@@ -37,7 +40,7 @@ public class PaymentController {
                             .collectList()
                             .map(commands -> {
                                 payment.setListeCommands(commands);
-                                return ResponseEntity.status(200).body(payment);
+                                return ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment));
                             });
                 }).onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
     }
