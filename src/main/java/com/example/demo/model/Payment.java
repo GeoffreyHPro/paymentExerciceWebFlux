@@ -14,25 +14,25 @@ import com.example.demo.utils.PaymentStatus;
 
 public class Payment {
     @Id
-    private int idPayment;
+    private int id;
 
     private Double amount;
 
-    private Currency currency;
+    private String currency;
 
-    private PaymentMeans paymentMeans;
+    private String paymentMeans;
 
-    private PaymentStatus paymentStatus;
+    private String paymentStatus;
 
     private List<Command> listCommands;
 
     public Payment() {
         this.listCommands = new ArrayList<>();
-        this.paymentStatus = PaymentStatus.IN_PROGRESS;
+        this.paymentStatus = PaymentStatus.IN_PROGRESS.name();
         this.amount = 0.0;
     }
 
-    public Currency getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
@@ -41,14 +41,14 @@ public class Payment {
     }
 
     public int getIdPayment() {
-        return idPayment;
+        return id;
     }
 
-    public PaymentMeans getPaymentMeans() {
+    public String getPaymentMeans() {
         return paymentMeans;
     }
 
-    public PaymentStatus getPaymentStatus() {
+    public String getPaymentStatus() {
         return paymentStatus;
     }
 
@@ -58,11 +58,11 @@ public class Payment {
     }
 
     public void setCurrency(Currency currency) {
-        this.currency = currency;
+        this.currency = currency.name();
     }
 
     public void setPaymentMeans(PaymentMeans paymentMeans) {
-        this.paymentMeans = paymentMeans;
+        this.paymentMeans = paymentMeans.name();
     }
 
     public void setPaymentStatus(PaymentStatus paymentStatus) throws PaymentStatusException {
@@ -80,11 +80,11 @@ public class Payment {
 
     private void paymentStatusIsValid(PaymentStatus paymentStatus) throws PaymentStatusException {
         if (paymentStatus.equals(PaymentStatus.CAPTURED) &&
-                this.paymentStatus.equals(PaymentStatus.AUTHORIZED)) {
-            this.paymentStatus = paymentStatus;
+                this.paymentStatus.equals(PaymentStatus.AUTHORIZED.name())) {
+            this.paymentStatus = paymentStatus.name();
         } else if (paymentStatus.equals(PaymentStatus.AUTHORIZED)
-                && this.paymentStatus.equals(PaymentStatus.IN_PROGRESS)) {
-            this.paymentStatus = paymentStatus;
+                && this.paymentStatus.equals(PaymentStatus.IN_PROGRESS.name())) {
+            this.paymentStatus = paymentStatus.name();
         } else {
             throw new PaymentStatusException();
         }
