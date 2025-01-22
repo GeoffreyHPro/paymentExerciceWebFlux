@@ -5,6 +5,7 @@ import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,15 @@ public class CommandController {
         return commandService.getCommand(id).map(command -> ResponseEntity.status(200).body(command))
                 .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
 
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<?>> addCommand() {
+        try {
+            Mono<Command> command = commandService.addCommand();
+            return Mono.just(ResponseEntity.status(201).body(command));
+        } catch (Exception e) {
+            return Mono.just(ResponseEntity.status(400).body("Error of created command"));
+        }
     }
 }
