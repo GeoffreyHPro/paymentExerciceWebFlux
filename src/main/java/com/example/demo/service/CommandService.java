@@ -50,7 +50,7 @@ public class CommandService {
                         String status = payment.getPaymentStatus();
                         if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
                             command.setPaymentId(id);
-                            payment.setAmount(10.0);
+                            payment.setAmount(payment.getAmount() + command.getPrice());
                             return paymentRepository.save(payment)
                                     .then(commandRepository.save(command));
                         } else {
