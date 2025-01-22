@@ -1,14 +1,18 @@
 package com.example.demo.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import com.example.demo.exception.NegativeValueException;
 import com.example.demo.exception.NulValueException;
 
+
+
+@Table("command")
 public class Command {
 
     @Id
-    private int idCommand;
+    private int id;
 
     private String productName;
 
@@ -32,8 +36,12 @@ public class Command {
         this.price = price;
     }
 
-    public int getIdCommand() {
-        return idCommand;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Double getPrice() {
