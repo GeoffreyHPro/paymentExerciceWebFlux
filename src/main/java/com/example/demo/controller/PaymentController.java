@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PaymentDTO;
 import com.example.demo.exception.NotFoundException;
+import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.model.Payment;
 import com.example.demo.request.UpdatePaymentRequest;
 import com.example.demo.service.CommandService;
@@ -62,13 +63,14 @@ public class PaymentController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<PaymentDTO>> modifyPayment(@PathVariable int id,
-            @RequestBody UpdatePaymentRequest updatePaymentRequest) throws NotFoundException {
+            @RequestBody UpdatePaymentRequest updatePaymentRequest) throws NotFoundException,PaymentStatusException  {
 
         return paymentService.updatePayment(id, updatePaymentRequest)
                 .map(payment -> ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment)))
                 .onErrorResume(
                         NotFoundException.class,
-                        e -> Mono.just(ResponseEntity.status(404).body(null)));
+                        e -> Mono.just(ResponseEntity.status(404).body(null)))
+                        .onErrorResume(PaymentStatusException.class, e -> Mono.just(ResponseEntity.status(400).body(null)));
 
     }
 }
