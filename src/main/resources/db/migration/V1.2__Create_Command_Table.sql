@@ -4,8 +4,8 @@ CREATE TABLE command (
 	productRef VARCHAR(255),
 	quantity integer,
 	price numeric(10,2),
-	payment_id INTEGER,            
-    FOREIGN KEY (payment_id)         
+	paymentId INTEGER,            
+    FOREIGN KEY (paymentId)         
         REFERENCES payment(id)      
         ON DELETE CASCADE 
 );

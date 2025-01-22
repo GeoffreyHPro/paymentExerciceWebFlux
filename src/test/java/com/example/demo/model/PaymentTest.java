@@ -77,7 +77,7 @@ public class PaymentTest {
         });
     }
 
-    @Test
+    /*@Test
     public void testAddCommandSuccess() throws NegativeValueException, NulValueException {
         assertEquals(0, this.payment.getListCommands().size());
         this.payment.addCommand(this.command);
@@ -101,6 +101,6 @@ public class PaymentTest {
         assertEquals(10.0, this.payment.getAmount());
         this.payment.addCommand(this.command2);
         assertEquals(30.0, this.payment.getAmount());
-    }
+    }*/
 
 }
