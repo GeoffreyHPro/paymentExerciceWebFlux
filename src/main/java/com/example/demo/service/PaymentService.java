@@ -20,4 +20,8 @@ public class PaymentService {
         return payment.switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
+    public Mono<Payment> addPayment() {
+        return paymentRepository.save(new Payment());
+    }
+
 }
