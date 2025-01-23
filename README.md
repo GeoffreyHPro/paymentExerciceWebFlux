@@ -1,7 +1,9 @@
 # Project of payment API
 
 The project is a new version of paymentExercice : https://github.com/GeoffreyHPro/paymentExercice
-the old version works with h2 database and jpa.
+the old version i started works with h2 database and jpa.
+But i dont finish it to learn and implement exercie in webflux.
+
 This new version works with postgresql and webflux. 
 
 This project allows to create, read, and modify a payment. 
@@ -24,13 +26,13 @@ Here the database in API
 
 ✅ Read a payment
 
-⬜ create a command
+✅ create a command
 
-⬜ upload a command
+✅ modify a command
 
-⬜ create a payment
+✅ create a payment
 
-⬜ upload a payment
+✅ modify a payment
 
 # ⚡️ Standard Execution
 
@@ -38,6 +40,12 @@ Start postgresql database
 
 ```bash
 docker-compose up
+```
+
+Destroy database
+
+```bash
+docker-compose down -v
 ```
 
 Start API REST
