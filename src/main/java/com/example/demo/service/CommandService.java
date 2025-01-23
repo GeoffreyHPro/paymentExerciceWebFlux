@@ -30,6 +30,11 @@ public class CommandService {
         return command.switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
+    public Flux<Command> getAllCommands() throws NotFoundException {
+        Flux<Command> command = commandRepository.findAll();
+        return command.switchIfEmpty(Mono.error(new NotFoundException()));
+    }
+
     public Flux<Command> getCommands(int idPayment) {
         Flux<Command> command = commandRepository.findByPaymentId(idPayment);
         return command;

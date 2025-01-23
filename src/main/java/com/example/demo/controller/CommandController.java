@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -44,6 +45,16 @@ public class CommandController {
         return commandService.getCommand(id)
                 .map(command -> ResponseEntity.status(200).body(paymentMapper.toCommandDTO(command)))
                 .onErrorResume(NotFoundException.class, e -> Mono.just(ResponseEntity.status(404).body(null)));
+    }
+
+    @GetMapping
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "The command is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommandDTO.class))),
+        @ApiResponse(responseCode = "404", description = "The command is not found", content = @Content(mediaType = "application/json"))
+    })
+    public Flux<CommandDTO> getAllCommands() throws NotFoundException {
+        return commandService.getAllCommands()
+                .map(command -> paymentMapper.toCommandDTO(command));
     }
 
     @PostMapping("/{idPayment}")
