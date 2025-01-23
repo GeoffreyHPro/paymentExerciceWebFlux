@@ -9,6 +9,7 @@ import com.example.demo.model.Payment;
 import com.example.demo.repository.PaymentRepository;
 import com.example.demo.request.UpdatePaymentRequest;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -20,6 +21,11 @@ public class PaymentService {
     public Mono<Payment> getPayment(int id) throws NotFoundException{
         Mono<Payment> payment = paymentRepository.findById(id);
         return payment.switchIfEmpty(Mono.error(new NotFoundException()));
+    }
+
+    public Flux<Payment> getPayments() throws NotFoundException{
+        Flux<Payment> payment = paymentRepository.findAll();
+        return payment.switchIfEmpty(Flux.error(new NotFoundException()));
     }
 
     public Mono<Payment> addPayment() {
