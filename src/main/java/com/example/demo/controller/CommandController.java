@@ -62,13 +62,14 @@ public class CommandController {
                                 .map(command -> paymentMapper.toCommandDTO(command));
         }
 
-        @PostMapping("/{idPayment}")
+        @Operation(summary = "Add a new command linked with a payment", description = "The new command is linked with a payment if he's exist")
         @ApiResponses({
                         @ApiResponse(responseCode = "201", description = "The command is successfully created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommandDTO.class))),
                         @ApiResponse(responseCode = "404", description = "The payment is not found to link with the command"),
                         @ApiResponse(responseCode = "400", description = "The request body is not correctly give. Price or quantity is wrong"),
                         @ApiResponse(responseCode = "401", description = "You cannot add command to the payment id gived. The payment must be in IN_PROGRESS status")
         })
+        @PostMapping("/{idPayment}")
         public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment,
                         @RequestBody CommandRequest commandRequest) {
 
@@ -88,22 +89,26 @@ public class CommandController {
                                                 e -> Mono.just(ResponseEntity.status(400).body(null)));
         }
 
-        @PutMapping("/{id}")
+        @Operation(summary = "Modify the command", description = "You can modify the command if he is in IN_PROGRESS status")
         @ApiResponses({
-                        @ApiResponse(responseCode = "200", description = "The payment is successfully modified", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not Found"),
-                        @ApiResponse(responseCode = "400", description = "Payment status is not modifiable")
-        })
+                @ApiResponse(responseCode = "200", description = "The payment is successfully modified", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
+                @ApiResponse(responseCode = "404", description = "The payment is not Found"),
+                @ApiResponse(responseCode = "401", description = "Payment status is not modifiable"),
+                @ApiResponse(responseCode = "400", description = "The quantity/price is not valid")
+})
+        @PutMapping("/{id}")
         public Mono<ResponseEntity<CommandDTO>> modifyPayment(@PathVariable int id,
-                        @RequestBody UpdateCommandRequest updateCommandRequest)
-                        throws NotFoundException, PaymentStatusException {
+                        @RequestBody UpdateCommandRequest updateCommandRequest) {
 
                 return commandService.updateCommand(id, updateCommandRequest)
                                 .map(command -> ResponseEntity.status(200).body(paymentMapper.toCommandDTO(command)))
-                                .onErrorResume(
-                                                NotFoundException.class,
+                                .onErrorResume(NotFoundException.class,
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)))
                                 .onErrorResume(PaymentStatusException.class,
+                                                e -> Mono.just(ResponseEntity.status(401).body(null)))
+                                .onErrorResume(NulValueException.class,
+                                                e -> Mono.just(ResponseEntity.status(400).body(null)))
+                                .onErrorResume(NegativeValueException.class,
                                                 e -> Mono.just(ResponseEntity.status(400).body(null)));
 
         }

@@ -8,7 +8,6 @@ import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.NulValueException;
 import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.model.Command;
-import com.example.demo.model.Payment;
 import com.example.demo.repository.CommandRepository;
 import com.example.demo.repository.PaymentRepository;
 import com.example.demo.request.CommandRequest;
@@ -69,7 +68,7 @@ public class CommandService {
     public Mono<Command> updateCommand(int id, UpdateCommandRequest updateCommandRequest) {
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
-                .flatMap((Payment payment) -> {
+                .flatMap(payment -> {
                     if (payment.getPaymentStatus().equals(PaymentStatus.IN_PROGRESS.name())) {
                         return commandRepository.findById(id).flatMap((Command command) -> {
                             try {
