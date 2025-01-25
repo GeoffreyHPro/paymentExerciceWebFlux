@@ -36,8 +36,7 @@ public class CommandService {
     }
 
     public Flux<Command> getCommands(int idPayment) {
-        Flux<Command> command = commandRepository.findByPaymentId(idPayment);
-        return command;
+        return commandRepository.findByPaymentId(idPayment);
     }
 
     public Mono<Command> addCommand(int id, CommandRequest commandRequest) {

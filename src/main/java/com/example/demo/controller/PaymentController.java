@@ -19,6 +19,7 @@ import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
 import com.example.demo.service.PaymentService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,13 +40,13 @@ public class PaymentController {
         @Autowired
         private PaymentMapper paymentMapper;
 
-        @GetMapping("/{id}")
+        @Operation(summary = "Get the payment with the id given", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = "application/json"))
+                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = ""))
         })
-        public Mono<ResponseEntity<PaymentDTO>> getPayment(@PathVariable int id) throws NotFoundException {
-
+        @GetMapping("/{id}")
+        public Mono<ResponseEntity<PaymentDTO>> getPayment(@PathVariable int id) {
                 return paymentService.getPayment(id)
                                 .flatMap(payment -> {
                                         return commandService.getCommands(id)
@@ -54,21 +55,18 @@ public class PaymentController {
                                                                 payment.setListeCommands(commands);
                                                                 return ResponseEntity.status(200).body(
                                                                                 paymentMapper.toPaymentDTO(payment));
-                                                        }).onErrorResume(NotFoundException.class,
-                                                                        e -> Mono.just(ResponseEntity.status(404)
-                                                                                        .body(null)));
+                                                        });
                                 }).onErrorResume(NotFoundException.class,
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)));
-
         }
 
-        @GetMapping
+        @Operation(summary = "Get all the payments", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = "application/json"))
+                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = ""))
         })
-        public Flux<PaymentDTO> getPayments() throws NotFoundException {
-
+        @GetMapping
+        public Flux<PaymentDTO> getPayments() {
                 return paymentService.getPayments()
                                 .flatMap(payment -> {
                                         return commandService.getCommands(payment.getId())
@@ -78,7 +76,6 @@ public class PaymentController {
                                                                 return paymentMapper.toPaymentDTO(payment);
                                                         });
                                 });
-
         }
 
         @PostMapping

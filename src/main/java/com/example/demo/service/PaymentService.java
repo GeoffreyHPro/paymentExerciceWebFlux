@@ -18,14 +18,14 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Mono<Payment> getPayment(int id) throws NotFoundException{
-        Mono<Payment> payment = paymentRepository.findById(id);
-        return payment.switchIfEmpty(Mono.error(new NotFoundException()));
+    public Mono<Payment> getPayment(int id) {
+        return paymentRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
-    public Flux<Payment> getPayments() throws NotFoundException{
-        Flux<Payment> payment = paymentRepository.findAll();
-        return payment.switchIfEmpty(Flux.error(new NotFoundException()));
+    public Flux<Payment> getPayments() {
+        return paymentRepository.findAll()
+                .switchIfEmpty(Flux.error(new NotFoundException()));
     }
 
     public Mono<Payment> addPayment() {
