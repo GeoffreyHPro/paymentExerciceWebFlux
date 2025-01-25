@@ -21,6 +21,7 @@ import com.example.demo.request.UpdateCommandRequest;
 import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,11 +39,12 @@ public class CommandController {
         @Autowired
         private PaymentMapper paymentMapper;
 
-        @GetMapping("/{id}")
+        @Operation(summary = "Get the command by Id", description = "The id given in controller give you the command that is associated")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The command is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommandDTO.class))),
                         @ApiResponse(responseCode = "404", description = "The command is not found", content = @Content(mediaType = "application/json"))
         })
+        @GetMapping("/{id}")
         public Mono<ResponseEntity<CommandDTO>> getCommand(@PathVariable int id) {
                 return commandService.getCommand(id)
                                 .map(command -> ResponseEntity.status(200).body(paymentMapper.toCommandDTO(command)))
