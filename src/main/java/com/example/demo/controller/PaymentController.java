@@ -77,10 +77,11 @@ public class PaymentController {
                                 });
         }
 
-        @PostMapping
+        @Operation(summary = "A payment has been successfully created", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "201", description = "The payment is successfully created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
         })
+        @PostMapping
         public Mono<ResponseEntity<PaymentDTO>> addPayment() {
                 return paymentService.addPayment()
                                 .map(payment -> ResponseEntity.status(201).body(paymentMapper.toPaymentDTO(payment)));

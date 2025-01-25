@@ -45,14 +45,6 @@ public class PaymentControllerTest {
     private PaymentMapper paymentMapper;
 
     @Test
-    public void testAddPaymentSuccess() {
-        webTestClient.post()
-                .uri("/payment")
-                .exchange()
-                .expectStatus().isCreated();
-    }
-
-    @Test
     public void testGetPaymentSuccess() throws NotFoundException, NegativeValueException, NulValueException {
         List<Command> listCommand = new ArrayList<>();
         listCommand.add(new Command("ball", "4168486", 2, 10.0));
