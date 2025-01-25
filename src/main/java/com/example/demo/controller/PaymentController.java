@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.PaymentDTO;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.PaymentStatusException;
-import com.example.demo.model.Payment;
 import com.example.demo.request.UpdatePaymentRequest;
 import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
@@ -81,15 +80,10 @@ public class PaymentController {
         @PostMapping
         @ApiResponses({
                         @ApiResponse(responseCode = "201", description = "The payment is successfully created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "400", description = "Error in the creation of payment", content = @Content(mediaType = "application/json"))
         })
-        public Mono<ResponseEntity<?>> addPayment() {
-                try {
-                        Mono<Payment> payment = paymentService.addPayment();
-                        return Mono.just(ResponseEntity.status(201).body(payment));
-                } catch (Exception e) {
-                        return Mono.just(ResponseEntity.status(400).body(null));
-                }
+        public Mono<ResponseEntity<PaymentDTO>> addPayment() {
+                return paymentService.addPayment()
+                                .map(payment -> ResponseEntity.status(201).body(paymentMapper.toPaymentDTO(payment)));
         }
 
         @PutMapping("/{id}")
