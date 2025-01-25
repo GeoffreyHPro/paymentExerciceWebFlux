@@ -8,7 +8,6 @@ import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.NulValueException;
 import com.example.demo.exception.PaymentStatusException;
 import com.example.demo.model.Command;
-import com.example.demo.model.Payment;
 import com.example.demo.repository.CommandRepository;
 import com.example.demo.repository.PaymentRepository;
 import com.example.demo.request.CommandRequest;
@@ -27,35 +26,29 @@ public class CommandService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Mono<Command> getCommand(int id) throws NotFoundException {
-        Mono<Command> command = commandRepository.findById(id);
-        return command.switchIfEmpty(Mono.error(new NotFoundException()));
+    public Mono<Command> getCommand(int id) {
+        return commandRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
-    public Flux<Command> getAllCommands() throws NotFoundException {
-        Flux<Command> command = commandRepository.findAll();
-        return command.switchIfEmpty(Mono.error(new NotFoundException()));
+    public Flux<Command> getAllCommands() {
+        return commandRepository.findAll();
     }
 
     public Flux<Command> getCommands(int idPayment) {
-        Flux<Command> command = commandRepository.findByPaymentId(idPayment);
-        return command;
+        return commandRepository.findByPaymentId(idPayment);
     }
 
-    public Mono<Command> addCommand(int id, CommandRequest commandRequest)
-            throws NegativeValueException, NulValueException {
-        Command command = new Command();
-        command.setPrice(commandRequest.getPrice());
-        command.setQuantity(commandRequest.getQuantity());
-        command.setProductName(commandRequest.getProductName());
-        command.setProductRef(commandRequest.getProductRef());
-
+    public Mono<Command> addCommand(int id, CommandRequest commandRequest) {
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
                 .flatMap(payment -> {
                     try {
                         String status = payment.getPaymentStatus();
                         if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
+                            Command command = new Command(commandRequest.getProductName(),
+                                    commandRequest.getProductRef(), commandRequest.getQuantity(),
+                                    commandRequest.getPrice());
                             command.setPaymentId(id);
                             payment.setAmount(payment.getAmount() + command.getPrice());
                             return paymentRepository.save(payment)
@@ -63,8 +56,10 @@ public class CommandService {
                         } else {
                             return Mono.error(new PaymentStatusException());
                         }
-                    } catch (Exception e) {
-                        return Mono.error(new PaymentStatusException());
+                    } catch (NegativeValueException e) {
+                        return Mono.error(new NegativeValueException());
+                    } catch (NulValueException e) {
+                        return Mono.error(new NulValueException());
                     }
                 });
     }
@@ -72,7 +67,7 @@ public class CommandService {
     public Mono<Command> updateCommand(int id, UpdateCommandRequest updateCommandRequest) {
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
-                .flatMap((Payment payment) -> {
+                .flatMap(payment -> {
                     if (payment.getPaymentStatus().equals(PaymentStatus.IN_PROGRESS.name())) {
                         return commandRepository.findById(id).flatMap((Command command) -> {
                             try {

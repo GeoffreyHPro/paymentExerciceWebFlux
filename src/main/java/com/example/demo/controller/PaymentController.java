@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.PaymentDTO;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.exception.PaymentStatusException;
-import com.example.demo.model.Payment;
 import com.example.demo.request.UpdatePaymentRequest;
 import com.example.demo.service.CommandService;
 import com.example.demo.service.PaymentMapper;
 import com.example.demo.service.PaymentService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,13 +39,13 @@ public class PaymentController {
         @Autowired
         private PaymentMapper paymentMapper;
 
-        @GetMapping("/{id}")
+        @Operation(summary = "Get the payment with the id given", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = "application/json"))
+                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = ""))
         })
-        public Mono<ResponseEntity<PaymentDTO>> getPayment(@PathVariable int id) throws NotFoundException {
-
+        @GetMapping("/{id}")
+        public Mono<ResponseEntity<PaymentDTO>> getPayment(@PathVariable int id) {
                 return paymentService.getPayment(id)
                                 .flatMap(payment -> {
                                         return commandService.getCommands(id)
@@ -54,21 +54,18 @@ public class PaymentController {
                                                                 payment.setListeCommands(commands);
                                                                 return ResponseEntity.status(200).body(
                                                                                 paymentMapper.toPaymentDTO(payment));
-                                                        }).onErrorResume(NotFoundException.class,
-                                                                        e -> Mono.just(ResponseEntity.status(404)
-                                                                                        .body(null)));
+                                                        });
                                 }).onErrorResume(NotFoundException.class,
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)));
-
         }
 
-        @GetMapping
+        @Operation(summary = "Get all the payments", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = "application/json"))
+                        @ApiResponse(responseCode = "404", description = "The payment is not found", content = @Content(mediaType = ""))
         })
-        public Flux<PaymentDTO> getPayments() throws NotFoundException {
-
+        @GetMapping
+        public Flux<PaymentDTO> getPayments() {
                 return paymentService.getPayments()
                                 .flatMap(payment -> {
                                         return commandService.getCommands(payment.getId())
@@ -78,40 +75,34 @@ public class PaymentController {
                                                                 return paymentMapper.toPaymentDTO(payment);
                                                         });
                                 });
-
         }
 
-        @PostMapping
+        @Operation(summary = "A payment has been successfully created", description = "")
         @ApiResponses({
                         @ApiResponse(responseCode = "201", description = "The payment is successfully created", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "400", description = "Error in the creation of payment", content = @Content(mediaType = "application/json"))
         })
-        public Mono<ResponseEntity<?>> addPayment() {
-                try {
-                        Mono<Payment> payment = paymentService.addPayment();
-                        return Mono.just(ResponseEntity.status(201).body(payment));
-                } catch (Exception e) {
-                        return Mono.just(ResponseEntity.status(400).body(null));
-                }
+        @PostMapping
+        public Mono<ResponseEntity<PaymentDTO>> addPayment() {
+                return paymentService.addPayment()
+                                .map(payment -> ResponseEntity.status(201).body(paymentMapper.toPaymentDTO(payment)));
         }
 
-        @PutMapping("/{id}")
+        @Operation(summary = "Update the payment", description = "Only status: IN_PROGRESS -> IN_PROGRESS | AUTHORIZED, AUTHORIZED -> AUTHORIZED | CAPTURED")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully modified", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not Found"),
-                        @ApiResponse(responseCode = "400", description = "Payment status is not modifiable")
+                        @ApiResponse(responseCode = "404", description = "The payment is not Found", content = @Content(mediaType = "")),
+                        @ApiResponse(responseCode = "401", description = "Payment status is not modifiable", content = @Content(mediaType = ""))
         })
+        @PutMapping("/{id}")
         public Mono<ResponseEntity<PaymentDTO>> modifyPayment(@PathVariable int id,
-                        @RequestBody UpdatePaymentRequest updatePaymentRequest)
-                        throws NotFoundException, PaymentStatusException {
-
+                        @RequestBody UpdatePaymentRequest updatePaymentRequest) {
                 return paymentService.updatePayment(id, updatePaymentRequest)
                                 .map(payment -> ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment)))
                                 .onErrorResume(
                                                 NotFoundException.class,
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)))
                                 .onErrorResume(PaymentStatusException.class,
-                                                e -> Mono.just(ResponseEntity.status(400).body(null)));
+                                                e -> Mono.just(ResponseEntity.status(401).body(null)));
 
         }
 }

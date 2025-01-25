@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.CommandDTO;
@@ -29,6 +31,8 @@ public class PaymentMapper {
         paymentDTO.setPaymentStatus(payment.getPaymentStatus());
         if (payment.getListeCommands() != null && payment.getListeCommands().size() > 0) {
             paymentDTO.setListeCommands(payment.getListeCommands());
+        } else {
+            paymentDTO.setListeCommands(new ArrayList<>());
         }
         return paymentDTO;
     }
