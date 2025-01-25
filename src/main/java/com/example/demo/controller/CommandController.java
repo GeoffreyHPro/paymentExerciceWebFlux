@@ -52,12 +52,12 @@ public class CommandController {
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)));
         }
 
-        @GetMapping
+        @Operation(summary = "Get All the commands", description = "Return an array of all commands, if is empty, it's also return")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The command is successfully get", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommandDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The command is not found", content = @Content(mediaType = "application/json"))
         })
-        public Flux<CommandDTO> getAllCommands() throws NotFoundException {
+        @GetMapping
+        public Flux<CommandDTO> getAllCommands() {
                 return commandService.getAllCommands()
                                 .map(command -> paymentMapper.toCommandDTO(command));
         }
