@@ -87,23 +87,22 @@ public class PaymentController {
                                 .map(payment -> ResponseEntity.status(201).body(paymentMapper.toPaymentDTO(payment)));
         }
 
-        @PutMapping("/{id}")
+        @Operation(summary = "Update the payment", description = "Only status: IN_PROGRESS -> IN_PROGRESS | AUTHORIZED, AUTHORIZED -> AUTHORIZED | CAPTURED")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "The payment is successfully modified", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaymentDTO.class))),
-                        @ApiResponse(responseCode = "404", description = "The payment is not Found"),
-                        @ApiResponse(responseCode = "400", description = "Payment status is not modifiable")
+                        @ApiResponse(responseCode = "404", description = "The payment is not Found", content = @Content(mediaType = "")),
+                        @ApiResponse(responseCode = "401", description = "Payment status is not modifiable", content = @Content(mediaType = ""))
         })
+        @PutMapping("/{id}")
         public Mono<ResponseEntity<PaymentDTO>> modifyPayment(@PathVariable int id,
-                        @RequestBody UpdatePaymentRequest updatePaymentRequest)
-                        throws NotFoundException, PaymentStatusException {
-
+                        @RequestBody UpdatePaymentRequest updatePaymentRequest) {
                 return paymentService.updatePayment(id, updatePaymentRequest)
                                 .map(payment -> ResponseEntity.status(200).body(paymentMapper.toPaymentDTO(payment)))
                                 .onErrorResume(
                                                 NotFoundException.class,
                                                 e -> Mono.just(ResponseEntity.status(404).body(null)))
                                 .onErrorResume(PaymentStatusException.class,
-                                                e -> Mono.just(ResponseEntity.status(400).body(null)));
+                                                e -> Mono.just(ResponseEntity.status(401).body(null)));
 
         }
 }
