@@ -27,9 +27,9 @@ public class CommandService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Mono<Command> getCommand(int id) throws NotFoundException {
-        Mono<Command> command = commandRepository.findById(id);
-        return command.switchIfEmpty(Mono.error(new NotFoundException()));
+    public Mono<Command> getCommand(int id) {
+        return commandRepository.findById(id)
+                .switchIfEmpty(Mono.error(new NotFoundException()));
     }
 
     public Flux<Command> getAllCommands() throws NotFoundException {
