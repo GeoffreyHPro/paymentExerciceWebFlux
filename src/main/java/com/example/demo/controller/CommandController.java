@@ -70,8 +70,7 @@ public class CommandController {
                         @ApiResponse(responseCode = "401", description = "You cannot add command to the payment id gived. The payment must be in IN_PROGRESS status")
         })
         public Mono<ResponseEntity<CommandDTO>> addCommand(@PathVariable int idPayment,
-                        @RequestBody CommandRequest commandRequest)
-                        throws NegativeValueException, NulValueException, PaymentStatusException {
+                        @RequestBody CommandRequest commandRequest) {
 
                 if (!commandRequest.isValid()) {
                         return Mono.just(ResponseEntity.status(400).body(null));

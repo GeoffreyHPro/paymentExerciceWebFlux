@@ -41,20 +41,16 @@ public class CommandService {
         return command;
     }
 
-    public Mono<Command> addCommand(int id, CommandRequest commandRequest)
-            throws NegativeValueException, NulValueException {
-        Command command = new Command();
-        command.setPrice(commandRequest.getPrice());
-        command.setQuantity(commandRequest.getQuantity());
-        command.setProductName(commandRequest.getProductName());
-        command.setProductRef(commandRequest.getProductRef());
-
+    public Mono<Command> addCommand(int id, CommandRequest commandRequest) {
         return paymentRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))
                 .flatMap(payment -> {
                     try {
                         String status = payment.getPaymentStatus();
                         if (status.equals(PaymentStatus.IN_PROGRESS.name())) {
+                            Command command = new Command(commandRequest.getProductName(),
+                                    commandRequest.getProductRef(), commandRequest.getQuantity(),
+                                    commandRequest.getPrice());
                             command.setPaymentId(id);
                             payment.setAmount(payment.getAmount() + command.getPrice());
                             return paymentRepository.save(payment)
@@ -62,8 +58,10 @@ public class CommandService {
                         } else {
                             return Mono.error(new PaymentStatusException());
                         }
-                    } catch (Exception e) {
-                        return Mono.error(new PaymentStatusException());
+                    } catch (NegativeValueException e) {
+                        return Mono.error(new NegativeValueException());
+                    } catch (NulValueException e) {
+                        return Mono.error(new NulValueException());
                     }
                 });
     }
